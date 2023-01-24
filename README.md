@@ -25,3 +25,8 @@ Requirements:
   - [flutter](https://flutter.dev/)
   - [git](https://git-scm.com/)
   - [yamlfmt](https://github.com/google/yamlfmt)
+
+Differences from `dart/flutter create`:
+- Sanitizes generated `pubspec.yaml`
+- Replaces `lints`/`flutter_lints` with `rexios_lints`
+- Runs `git init`, `git add .`, and `git commit -m "Initial commit"`

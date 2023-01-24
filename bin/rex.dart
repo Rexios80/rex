@@ -91,9 +91,22 @@ mixin CreateDartMixin on Command {
 
     final path = args.last;
     final pubspec = File('$path/pubspec.yaml');
-    final pubspecContent =
-        pubspec.readAsStringSync()
+    final pubspecContent = pubspec
+        .readAsStringSync()
         // Remove all comments including leading spaces
-        .replaceAll(RegExp('[ ]*#.*'), '');
+        .replaceAll(RegExp('[ ]*#.*'), '')
+        .replaceFirst(RegExp('publish_to: .*'), 'publish_to: none')
+        .replaceFirst(RegExp('cupertino_icons: .*'), '')
+        .replaceFirst(RegExp('.*lints: .*'), '');
+
+    pubspec.writeAsStringSync(pubspecContent);
+
+    // Replace default lints with my own
+    Process.runSync(
+      name,
+      ['pub', 'add', 'rexios_lints', '--dev'],
+      workingDirectory: path,
+    );
+    Process.runSync('yamlfmt', ['.'], workingDirectory: path);
   }
 }
