@@ -17,6 +17,10 @@ Available commands:
 Run "rex help <command>" for more information about a command.
 ```
 
+Installation:
+- Clone this repository
+- Run `dart pub global activate --source path .` in the repository
+
 Requirements:
 - `open`, `switch`
   - [VSCode](https://code.visualstudio.com/)
