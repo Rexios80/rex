@@ -5,6 +5,7 @@ import 'package:args/command_runner.dart';
 import 'command/clone.dart';
 import 'command/create.dart';
 import 'command/open.dart';
+import 'command/reactivate.dart';
 import 'command/switch.dart';
 import 'command/view.dart';
 
@@ -19,6 +20,7 @@ void main(List<String> args) {
       ..addCommand(CreateCommand())
       ..addCommand(CloneCommand())
       ..addCommand(ViewCommand())
+      ..addCommand(ReactivateCommand())
       ..run(args),
     (error, stack) => print(error),
   );

@@ -84,5 +84,7 @@ class CreateDartCommand extends Command {
       ['commit', '-m', 'Initial commit'],
       workingDirectory: path,
     );
+
+    await runner!.run(['open', path]);
   }
 }

@@ -14,6 +14,7 @@ class ViewCommand extends Command {
 
   ViewCommand() {
     addSubcommand(ViewPubCommand());
+    addSubcommand(ViewGithubCommand());
   }
 }
 
@@ -34,5 +35,25 @@ class ViewPubCommand extends Command {
       runner!.usageException('Please specify a package to view');
     }
     await runProcess('open', ['https://pub.dev/packages/$package']);
+  }
+}
+
+class ViewGithubCommand extends Command {
+  @override
+  final name = 'github';
+
+  @override
+  final description = 'Open a repository on github.com';
+
+  @override
+  late final invocation = 'rex view $name [slug]';
+
+  @override
+  Future<void> run() async {
+    final slug = argResults?.rest.firstOrNull;
+    if (slug == null) {
+      runner!.usageException('Please specify a repository to view');
+    }
+    await runProcess('open', ['https://github.com/$slug']);
   }
 }
