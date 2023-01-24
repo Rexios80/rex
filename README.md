@@ -10,6 +10,7 @@ Global options:
 -h, --help    Print this usage information.
 
 Available commands:
+  create   Create a new project
   open     Open a project in in VSCode and Sublime Merge
   switch   Open a project reusing the current windows
 
