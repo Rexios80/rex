@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:collection/collection.dart';
 
@@ -61,33 +62,35 @@ class CreateCommand extends Command {
   final invocation = 'rex create [framework] [arguments]';
 
   CreateCommand() {
-    addSubcommand(CreateDartCommand());
-    addSubcommand(CreateFlutterCommand());
+    addSubcommand(CreateDartCommand('dart'));
+    addSubcommand(CreateDartCommand('flutter'));
   }
 }
 
-class CreateDartCommand extends Command with CreateDartMixin {
+class CreateDartCommand extends Command {
   @override
-  final name = 'dart';
-}
-
-class CreateFlutterCommand extends Command with CreateDartMixin {
-  @override
-  final name = 'flutter';
-}
-
-mixin CreateDartMixin on Command {
-  @override
-  String get description => 'Create a new $name project';
+  final String name;
 
   @override
-  String get invocation => 'rex create $name [arguments]';
+  late String description = 'Create a new $name project';
+
+  @override
+  late String invocation = 'rex create $name [arguments]';
+
+  CreateDartCommand(this.name) {
+    argParser.addFlag(
+      'package',
+      abbr: 'p',
+      negatable: false,
+      help: 'Use if creating a package',
+    );
+  }
 
   @override
   void run() {
     print('Creating a new $name project...');
     final args = argResults?.rest ?? [];
-    Process.runSync('dart', ['create', ...args]);
+    Process.runSync(name, ['create', ...args]);
 
     final path = args.last;
     final pubspec = File('$path/pubspec.yaml');
@@ -95,9 +98,14 @@ mixin CreateDartMixin on Command {
         .readAsStringSync()
         // Remove all comments including leading spaces
         .replaceAll(RegExp('[ ]*#.*'), '')
+        // Fix `publish_to` line
         .replaceFirst(RegExp('publish_to: .*'), 'publish_to: none')
+        // Remove `cupertino_icons` package
         .replaceFirst(RegExp('cupertino_icons: .*'), '')
-        .replaceFirst(RegExp('.*lints: .*'), '');
+        // Remove any `lints` package
+        .replaceFirst(RegExp('.*lints: .*'), '')
+        // Remove extra newlines
+        .replaceAll(RegExp('\n\n\n+'), '\n\n');
 
     pubspec.writeAsStringSync(pubspecContent);
 
@@ -107,6 +115,8 @@ mixin CreateDartMixin on Command {
       ['pub', 'add', 'rexios_lints', '--dev'],
       workingDirectory: path,
     );
-    Process.runSync('yamlfmt', ['.'], workingDirectory: path);
+
+    File('$path/.analysis_options.yaml')
+        .writeAsStringSync('include: package:rexios_lints/$name/core.yaml');
   }
 }

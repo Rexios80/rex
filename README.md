@@ -24,7 +24,6 @@ Requirements:
   - [dart](https://dart.dev/)
   - [flutter](https://flutter.dev/)
   - [git](https://git-scm.com/)
-  - [yamlfmt](https://github.com/google/yamlfmt)
 
 Differences from `dart/flutter create`:
 - Sanitizes generated `pubspec.yaml`
