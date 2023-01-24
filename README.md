@@ -33,4 +33,5 @@ Requirements:
 Differences from `dart/flutter create`:
 - Sanitizes generated `pubspec.yaml`
 - Replaces `lints`/`flutter_lints` with `rexios_lints`
+- Adds a `LICENSE` to packages
 - Runs `git init`, `git add .`, and `git commit -m "Initial commit"`
