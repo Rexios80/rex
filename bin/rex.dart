@@ -9,7 +9,7 @@ import 'command/reactivate.dart';
 import 'command/switch.dart';
 import 'command/view.dart';
 
-void main(List<String> args) {
+void main(List<String> arguments) {
   runZonedGuarded(
     () => CommandRunner(
       'rex',
@@ -21,7 +21,7 @@ void main(List<String> args) {
       ..addCommand(CloneCommand())
       ..addCommand(ViewCommand())
       ..addCommand(ReactivateCommand())
-      ..run(args),
+      ..run(arguments),
     (error, stack) => print(error),
   );
 }
