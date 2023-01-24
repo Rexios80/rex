@@ -1,8 +1,15 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:ansicolor/ansicolor.dart';
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:collection/collection.dart';
+
+final magentaPen = AnsiPen()..magenta();
+final greenPen = AnsiPen()..green();
+final yellowPen = AnsiPen()..yellow();
+final redPen = AnsiPen()..red();
 
 void main(List<String> args) {
   final runner =
@@ -24,11 +31,11 @@ class OpenCommand extends Command {
   final invocation = 'rex open [path]';
 
   @override
-  void run() {
+  Future<void> run() async {
     final path = argResults?.rest.firstOrNull ?? '.';
     print('Opening $path in VSCode and Sublime Merge...');
-    Process.runSync('smerge', [path]);
-    Process.runSync('code', [path]);
+    await runProcess('smerge', [path]);
+    await runProcess('code', [path]);
   }
 }
 
@@ -43,11 +50,11 @@ class SwitchCommand extends Command {
   final invocation = 'rex switch [path]';
 
   @override
-  void run() {
+  Future<void> run() async {
     final path = argResults?.rest.firstOrNull ?? '.';
     print('Opening $path in existing VSCode and Sublime Merge windows...');
-    Process.runSync('smerge', [path]);
-    Process.runSync('code', ['-r', path]);
+    await runProcess('smerge', [path]);
+    await runProcess('code', ['-r', path]);
   }
 }
 
@@ -83,10 +90,10 @@ class CreateDartCommand extends Command {
   CreateDartCommand(this.name);
 
   @override
-  void run() {
+  Future<void> run() async {
     print('Creating a new $name project...');
     final args = argResults?.rest ?? [];
-    Process.runSync(name, ['create', ...args]);
+    await runProcess(name, ['create', ...args]);
 
     final path = args.last;
     final pubspec = File('$path/pubspec.yaml');
@@ -106,25 +113,48 @@ class CreateDartCommand extends Command {
     pubspec.writeAsStringSync(pubspecContent);
 
     // Replace default lints with my own
-    Process.runSync(
+    await runProcess(
       name,
       ['pub', 'add', 'rexios_lints', '--dev'],
       workingDirectory: path,
     );
 
-    final rules = args.any(['package', 'plugin', 'plugin_ffi'].contains)
-        ? 'package'
-        : 'core';
+    final isPackage = args.any(['package', 'plugin', 'plugin_ffi'].contains);
+    final rules = isPackage ? 'package' : 'core';
 
-    File('$path/.analysis_options.yaml')
+    File('$path/analysis_options.yaml')
         .writeAsStringSync('include: package:rexios_lints/$name/$rules.yaml');
 
-    Process.runSync('git', ['init'], workingDirectory: path);
-    Process.runSync('git', ['add', '.'], workingDirectory: path);
-    Process.runSync(
+    // Initialize a git repository
+    await runProcess('git', ['init'], workingDirectory: path);
+    await runProcess('git', ['add', '.'], workingDirectory: path);
+    await runProcess(
       'git',
       ['commit', '-m', 'Initial commit'],
       workingDirectory: path,
     );
+  }
+}
+
+const decoder = Utf8Decoder();
+
+Future<void> runProcess(
+  String executable,
+  List<String> arguments, {
+  String? workingDirectory,
+}) async {
+  final process = await Process.start(
+    executable,
+    arguments,
+    workingDirectory: workingDirectory,
+  );
+
+  process.stdout.listen((e) => stdout.write(decoder.convert(e)));
+  process.stderr.listen((e) => stderr.write(redPen(decoder.convert(e))));
+
+  final exitCode = await process.exitCode;
+  if (exitCode != 0) {
+    print(redPen('Process exited with code $exitCode'));
+    exit(exitCode);
   }
 }

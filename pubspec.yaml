@@ -4,6 +4,7 @@ environment:
   sdk: ">=2.18.0 <3.0.0"
 
 dependencies:
+  ansicolor: ^2.0.1
   args: ^2.3.2
   collection: ^1.17.0
 
