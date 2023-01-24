@@ -5,6 +5,7 @@ import 'package:ansicolor/ansicolor.dart';
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:collection/collection.dart';
+import 'package:rex/license.dart';
 
 final magentaPen = AnsiPen()..magenta();
 final greenPen = AnsiPen()..green();
@@ -124,6 +125,10 @@ class CreateDartCommand extends Command {
 
     File('$path/analysis_options.yaml')
         .writeAsStringSync('include: package:rexios_lints/$name/$rules.yaml');
+
+    if (isPackage) {
+      File('$path/LICENSE').writeAsStringSync(generateLicenseText());
+    }
 
     // Initialize a git repository
     await runProcess('git', ['init'], workingDirectory: path);
