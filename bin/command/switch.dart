@@ -16,7 +16,7 @@ class SwitchCommand extends Command {
   Future<void> run() async {
     final path = argResults?.rest.firstOrNull ?? '.';
     print('Opening $path in existing VSCode and Sublime Merge windows...');
-    await runProcess('smerge', [path]);
+    await runProcess('smerge', ['-b', path]);
     await runProcess('code', ['-r', path]);
   }
 }

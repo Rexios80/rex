@@ -1,10 +1,12 @@
 import 'package:args/command_runner.dart';
 import 'package:collection/collection.dart';
+import 'package:rex/pub.dart';
 import 'package:rex/run_process.dart';
+import 'package:rex/util.dart';
 
 class CloneCommand extends Command {
   @override
-  final name = 'create';
+  final name = 'clone';
 
   @override
   final description = 'Clone a project';
@@ -13,8 +15,33 @@ class CloneCommand extends Command {
   final invocation = 'rex clone [framework] [arguments]';
 
   CloneCommand() {
+    addSubcommand(ClonePubCommand());
     addSubcommand(CloneDartCommand('dart'));
     addSubcommand(CloneDartCommand('flutter'));
+  }
+}
+
+class ClonePubCommand extends Command {
+  @override
+  final String name = 'pub';
+
+  @override
+  final description = 'Clone a pub package repository';
+
+  @override
+  late String invocation = 'rex clone $name [package]';
+
+  @override
+  Future<void> run() async {
+    final package = argResults?.rest.firstOrNull;
+    if (package == null) {
+      runner!.usageException('Please specify a package to clone');
+    }
+    final url = await Pub.getPackageRepo(package);
+    if (url == null) {
+      runner!.usageException('Could not find a repository for $package');
+    }
+    await runner!.run(['clone', 'dart', url]);
   }
 }
 
@@ -26,8 +53,9 @@ class CloneDartCommand extends Command {
   late String description = 'Clone a $name project';
 
   @override
-  late String invocation = 'rex clone $name [arguments]';
+  late String invocation = 'rex clone $name [url]';
 
+  /// The [name] does not affect the [run] method
   CloneDartCommand(this.name);
 
   @override
@@ -37,11 +65,11 @@ class CloneDartCommand extends Command {
       runner!.usageException('Please specify a URL to clone');
     }
     final folderName = url.split('/').last;
-    final folder = '~/repos/$folderName';
+    final folder = '$home/repos/$folderName';
 
     print('Cloning $url into $folder...');
     await runProcess('git', ['clone', url, folder]);
-    await runProcess(name, ['pub', 'get'], workingDirectory: folder);
+    await runProcess('puby', ['get'], workingDirectory: folder);
 
     await runner!.run(['open', folder]);
   }

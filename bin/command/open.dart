@@ -16,7 +16,7 @@ class OpenCommand extends Command {
   Future<void> run() async {
     final path = argResults?.rest.firstOrNull ?? '.';
     print('Opening $path in VSCode and Sublime Merge...');
-    await runProcess('smerge', [path]);
+    await runProcess('smerge', ['-b', path]);
     await runProcess('code', [path]);
   }
 }
