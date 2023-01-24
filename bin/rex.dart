@@ -69,6 +69,9 @@ class CreateCommand extends Command {
 
 class CreateDartCommand extends Command {
   @override
+  final argParser = ArgParser.allowAnything();
+
+  @override
   final String name;
 
   @override
@@ -77,14 +80,7 @@ class CreateDartCommand extends Command {
   @override
   late String invocation = 'rex create $name [arguments]';
 
-  CreateDartCommand(this.name) {
-    argParser.addFlag(
-      'package',
-      abbr: 'p',
-      negatable: false,
-      help: 'Use if creating a package',
-    );
-  }
+  CreateDartCommand(this.name);
 
   @override
   void run() {
@@ -116,7 +112,19 @@ class CreateDartCommand extends Command {
       workingDirectory: path,
     );
 
+    final rules = args.any(['package', 'plugin', 'plugin_ffi'].contains)
+        ? 'package'
+        : 'core';
+
     File('$path/.analysis_options.yaml')
-        .writeAsStringSync('include: package:rexios_lints/$name/core.yaml');
+        .writeAsStringSync('include: package:rexios_lints/$name/$rules.yaml');
+
+    Process.runSync('git', ['init'], workingDirectory: path);
+    Process.runSync('git', ['add', '.'], workingDirectory: path);
+    Process.runSync(
+      'git',
+      ['commit', '-m', 'Initial commit'],
+      workingDirectory: path,
+    );
   }
 }
