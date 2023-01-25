@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:args/command_runner.dart';
 
@@ -9,19 +10,23 @@ import 'command/reactivate.dart';
 import 'command/switch.dart';
 import 'command/view.dart';
 
-void main(List<String> arguments) {
-  runZonedGuarded(
-    () => CommandRunner(
-      'rex',
-      'Tailored convenience commands for developer Rexios',
-    )
-      ..addCommand(OpenCommand())
-      ..addCommand(SwitchCommand())
-      ..addCommand(CreateCommand())
-      ..addCommand(CloneCommand())
-      ..addCommand(ViewCommand())
-      ..addCommand(ReactivateCommand())
-      ..run(arguments),
+void main(List<String> arguments) async {
+  await runZonedGuarded(
+    () async {
+      final runner = CommandRunner(
+        'rex',
+        'Tailored convenience commands for developer Rexios',
+      )
+        ..addCommand(OpenCommand())
+        ..addCommand(SwitchCommand())
+        ..addCommand(CreateCommand())
+        ..addCommand(CloneCommand())
+        ..addCommand(ViewCommand())
+        ..addCommand(ReactivateCommand());
+      await runner.run(arguments);
+    },
     (error, stack) => print(error),
   );
+
+  exit(0);
 }

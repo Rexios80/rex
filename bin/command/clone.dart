@@ -1,5 +1,6 @@
 import 'package:args/command_runner.dart';
 import 'package:collection/collection.dart';
+import 'package:rex/pens.dart';
 import 'package:rex/pub.dart';
 import 'package:rex/run_process.dart';
 import 'package:rex/util.dart';
@@ -35,11 +36,12 @@ class ClonePubCommand extends Command {
   Future<void> run() async {
     final package = argResults?.rest.firstOrNull;
     if (package == null) {
-      runner!.usageException('Please specify a package to clone');
+      runner!.usageException(redPen('Specify a package to clone'));
     }
     final url = await Pub.getPackageRepo(package);
     if (url == null) {
-      runner!.usageException('Could not find a repository for $package');
+      print(redPen('Could not find a repository for $package'));
+      return;
     }
     await runner!.run(['clone', 'dart', url]);
   }
@@ -62,7 +64,7 @@ class CloneDartCommand extends Command {
   Future<void> run() async {
     final url = argResults?.rest.firstOrNull;
     if (url == null) {
-      runner!.usageException('Please specify a URL to clone');
+      runner!.usageException(redPen('Specify a URL to clone'));
     }
     final folderName = url.split('/').last;
     final folder = '$home/repos/$folderName';
