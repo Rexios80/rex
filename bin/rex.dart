@@ -7,6 +7,7 @@ import 'command/clone.dart';
 import 'command/create.dart';
 import 'command/open.dart';
 import 'command/reactivate.dart';
+import 'command/script.dart';
 import 'command/switch.dart';
 import 'command/view.dart';
 
@@ -22,7 +23,8 @@ void main(List<String> arguments) async {
         ..addCommand(CreateCommand())
         ..addCommand(CloneCommand())
         ..addCommand(ViewCommand())
-        ..addCommand(ReactivateCommand());
+        ..addCommand(ReactivateCommand())
+        ..addCommand(ScriptCommand());
       await runner.run(arguments);
     },
     (error, stack) => print(error),

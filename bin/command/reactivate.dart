@@ -1,5 +1,4 @@
 import 'package:args/command_runner.dart';
-import 'package:rex/run_process.dart';
 import 'package:rex/util.dart';
 
 class ReactivateCommand extends Command {

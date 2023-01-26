@@ -2,7 +2,6 @@ import 'package:args/command_runner.dart';
 import 'package:collection/collection.dart';
 import 'package:rex/pens.dart';
 import 'package:rex/pub.dart';
-import 'package:rex/run_process.dart';
 import 'package:rex/util.dart';
 
 class CloneCommand extends Command {

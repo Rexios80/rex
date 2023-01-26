@@ -3,7 +3,8 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:rex/license.dart';
-import 'package:rex/run_process.dart';
+import 'package:rex/scripts.dart';
+import 'package:rex/util.dart';
 
 class CreateCommand extends Command {
   @override
@@ -77,14 +78,7 @@ class CreateDartCommand extends Command {
     }
 
     // Initialize a git repository
-    await runProcess('git', ['init'], workingDirectory: path);
-    await runProcess('git', ['add', '.'], workingDirectory: path);
-    await runProcess(
-      'git',
-      ['commit', '-m', 'Initial commit'],
-      workingDirectory: path,
-    );
-
+    await runScript(gitInit, workingDirectory: path);
     await runner!.run(['open', path]);
   }
 }

@@ -1,6 +1,6 @@
 import 'package:args/command_runner.dart';
 import 'package:collection/collection.dart';
-import 'package:rex/run_process.dart';
+import 'package:rex/util.dart';
 
 class OpenCommand extends Command {
   @override
