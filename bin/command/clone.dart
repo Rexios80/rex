@@ -65,7 +65,7 @@ class CloneDartCommand extends Command {
     if (url == null) {
       runner!.usageException(redPen('Specify a URL to clone'));
     }
-    final folderName = url.split('/').last;
+    final folderName = url.split('/').where((e) => e.isNotEmpty).last;
     final folder = '$home/repos/$folderName';
 
     print('Cloning $url into $folder...');
