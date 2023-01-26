@@ -24,5 +24,4 @@ git commit -m "Initial commit"''';
 
 /// Gradle sync
 const gradleSync = r'''
-./gradlew prepareKotlinBuildScriptModel
-''';
+./gradlew prepareKotlinBuildScriptModel''';
