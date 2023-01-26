@@ -1,6 +1,5 @@
 import 'package:args/command_runner.dart';
 import 'package:collection/collection.dart';
-import 'package:rex/pens.dart';
 import 'package:rex/util.dart';
 
 class ViewCommand extends Command {
@@ -33,9 +32,10 @@ class ViewPubCommand extends Command {
   Future<void> run() async {
     final package = argResults?.rest.firstOrNull;
     if (package == null) {
-      runner!.usageException(redPen('Specify a package to view'));
+      await runProcess('open', ['https://pub.dev']);
+    } else {
+      await runProcess('open', ['https://pub.dev/packages/$package']);
     }
-    await runProcess('open', ['https://pub.dev/packages/$package']);
   }
 }
 
@@ -53,8 +53,9 @@ class ViewGithubCommand extends Command {
   Future<void> run() async {
     final slug = argResults?.rest.firstOrNull;
     if (slug == null) {
-      runner!.usageException(redPen('Please specify a repository to view'));
+      await runProcess('open', ['https://github.com']);
+    } else {
+      await runProcess('open', ['https://github.com/$slug']);
     }
-    await runProcess('open', ['https://github.com/$slug']);
   }
 }

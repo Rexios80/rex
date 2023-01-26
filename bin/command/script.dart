@@ -20,12 +20,8 @@ class ScriptCommand extends Command {
       runner!.usageException('Specify a script to run');
     }
 
-    final String script;
-    if (name == 'git-init') {
-      script = gitInit;
-    } else if (name == 'reset-xcode') {
-      script = resetXcode;
-    } else {
+    final script = scriptMap[name];
+    if (script == null) {
       runner!.usageException('Unknown script: $name');
     }
 

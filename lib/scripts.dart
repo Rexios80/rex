@@ -1,3 +1,10 @@
+/// Script map
+const scriptMap = {
+  'reset-xcode': resetXcode,
+  'git-init': gitInit,
+  'gradle-sync': gradleSync,
+};
+
 /// https://gist.github.com/maciekish/66b6deaa7bc979d0a16c50784e16d697
 const resetXcode = r'''
 killall Xcode
@@ -14,3 +21,8 @@ const gitInit = r'''
 git init
 git add .
 git commit -m "Initial commit"''';
+
+/// Gradle sync
+const gradleSync = r'''
+./gradlew prepareKotlinBuildScriptModel
+''';
