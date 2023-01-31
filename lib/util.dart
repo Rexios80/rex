@@ -33,7 +33,11 @@ Future<void> runProcess(
 
 /// Run a script string
 Future<void> runScript(String script, {String? workingDirectory}) async {
-  final commands = script.split('\n').map((e) => e.split(' '));
+  final commands = script.split('\n').map(
+        (e) => RegExp(r'[\""].+?[\""]|[^ ]+')
+            .allMatches(e)
+            .map((e) => e.group(0)!),
+      );
   for (final command in commands) {
     final executable = command.first;
     final arguments = command.skip(1).toList();
