@@ -36,7 +36,7 @@ Future<void> runScript(String script, {String? workingDirectory}) async {
   final commands = script.split('\n').map(
         (e) => RegExp(r'[\""].+?[\""]|[^ ]+')
             .allMatches(e)
-            .map((e) => e.group(0)!),
+            .map((e) => e.group(0)!.replaceAll('"', '')),
       );
   for (final command in commands) {
     final executable = command.first;
