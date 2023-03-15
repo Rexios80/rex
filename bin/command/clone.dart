@@ -15,9 +15,34 @@ class CloneCommand extends Command {
   final invocation = 'rex clone [framework] [arguments]';
 
   CloneCommand() {
+    addSubcommand(CloneRawCommand());
     addSubcommand(ClonePubCommand());
     addSubcommand(CloneDartCommand('dart'));
     addSubcommand(CloneDartCommand('flutter'));
+  }
+}
+
+class CloneRawCommand extends Command {
+  @override
+  final String name = 'raw';
+
+  @override
+  final description = 'Clone a repository without any special handling';
+
+  @override
+  late String invocation = 'rex clone $name [url]';
+
+  @override
+  Future<void> run() async {
+    final url = argResults?.rest.firstOrNull;
+    if (url == null) {
+      runner!.usageException(redPen('Specify a URL to clone'));
+    }
+    final folderName = url.split('/').where((e) => e.isNotEmpty).last;
+    final folder = '$home/repos/$folderName';
+
+    print('Cloning $url into $folder...');
+    await runProcess('git', ['clone', url, folder]);
   }
 }
 

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:pub_api_client/pub_api_client.dart';
 
 /// Access to pub data
