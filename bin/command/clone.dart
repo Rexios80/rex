@@ -22,28 +22,41 @@ class CloneCommand extends Command {
   }
 }
 
-class CloneRawCommand extends Command {
+abstract class BaseCloneCommand extends Command {
   @override
-  final String name = 'raw';
+  final String name;
 
+  BaseCloneCommand(this.name);
+
+  Future<void> clone({Future<void> Function(String folder)? preprocess}) async {
+    final url = argResults?.rest.firstOrNull;
+    if (url == null) {
+      runner!.usageException(redPen('Specify a URL to clone'));
+    }
+    final folderName =
+        url.split('/').where((e) => e.isNotEmpty).last.replaceAll('.git', '');
+    final folder = '$home/repos/$folderName';
+
+    print('Cloning $url into $folder...');
+    await runProcess('git', ['clone', url, folder]);
+
+    await preprocess?.call(folder);
+
+    await runner!.run(['open', folder]);
+  }
+}
+
+class CloneRawCommand extends BaseCloneCommand {
   @override
   final description = 'Clone a repository without any special handling';
 
   @override
   late String invocation = 'rex clone $name [url]';
 
-  @override
-  Future<void> run() async {
-    final url = argResults?.rest.firstOrNull;
-    if (url == null) {
-      runner!.usageException(redPen('Specify a URL to clone'));
-    }
-    final folderName = url.split('/').where((e) => e.isNotEmpty).last;
-    final folder = '$home/repos/$folderName';
+  CloneRawCommand() : super('raw');
 
-    print('Cloning $url into $folder...');
-    await runProcess('git', ['clone', url, folder]);
-  }
+  @override
+  Future<void> run() => clone();
 }
 
 class ClonePubCommand extends Command {
@@ -71,32 +84,19 @@ class ClonePubCommand extends Command {
   }
 }
 
-class CloneDartCommand extends Command {
+class CloneDartCommand extends BaseCloneCommand {
   @override
-  final String name;
-
-  @override
-  late String description = 'Clone a $name project';
+  late String description = 'Clone and setup a $name project';
 
   @override
   late String invocation = 'rex clone $name [url]';
 
   /// The [name] does not affect the [run] method
-  CloneDartCommand(this.name);
+  CloneDartCommand(super.name);
 
   @override
-  Future<void> run() async {
-    final url = argResults?.rest.firstOrNull;
-    if (url == null) {
-      runner!.usageException(redPen('Specify a URL to clone'));
-    }
-    final folderName = url.split('/').where((e) => e.isNotEmpty).last;
-    final folder = '$home/repos/$folderName';
-
-    print('Cloning $url into $folder...');
-    await runProcess('git', ['clone', url, folder]);
-    await runProcess('puby', ['get'], workingDirectory: folder);
-
-    await runner!.run(['open', folder]);
-  }
+  Future<void> run() => clone(
+        preprocess: (folder) =>
+            runProcess('puby', ['get'], workingDirectory: folder),
+      );
 }
