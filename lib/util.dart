@@ -1,13 +1,10 @@
-import 'dart:convert';
+import 'dart:async';
 import 'dart:io';
 
 import 'package:rex/pens.dart';
 
 /// Get the home directory
 final String home = Platform.environment['HOME']!;
-
-/// Decoder
-const decoder = Utf8Decoder();
 
 /// Run a process and print output to [stdout] and [stderr]
 Future<void> runProcess(
@@ -21,8 +18,8 @@ Future<void> runProcess(
     workingDirectory: workingDirectory,
   );
 
-  process.stdout.listen((e) => stdout.write(decoder.convert(e)));
-  process.stderr.listen((e) => stderr.write(redPen(decoder.convert(e))));
+  unawaited(stdout.addStream(process.stdout));
+  unawaited(stderr.addStream(process.stderr));
 
   final exitCode = await process.exitCode;
   if (exitCode != 0) {
