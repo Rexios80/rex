@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
-import 'package:rex/license.dart';
 import 'package:rex/scripts.dart';
 import 'package:rex/util.dart';
 
@@ -72,10 +71,6 @@ class CreateDartCommand extends Command {
 
     File('$path/analysis_options.yaml')
         .writeAsStringSync('include: package:rexios_lints/$name/$rules.yaml');
-
-    if (isPackage) {
-      File('$path/LICENSE').writeAsStringSync(generateLicenseText());
-    }
 
     // Initialize a git repository
     await runScript(gitInit, workingDirectory: path);
