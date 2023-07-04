@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:collection/collection.dart';
+import 'package:path/path.dart';
 import 'package:rex/pens.dart';
 import 'package:rex/util.dart';
 
@@ -23,7 +24,7 @@ class OpenCommand extends Command {
       return;
     }
 
-    print('Opening $path in the proper editors...');
+    print('Opening $path in Sublime Merge...');
     await runProcess('smerge', ['-b', path]);
 
     final files = Directory(path).listSync();
@@ -32,15 +33,20 @@ class OpenCommand extends Command {
     final xcworkspace =
         files.firstWhereOrNull((e) => e.path.endsWith('.xcworkspace'));
     if (xcworkspace != null) {
-      return runProcess('open', [xcworkspace.path]);
+      final path = relative(xcworkspace.path);
+      print('Opening $path in Xcode...');
+      return runProcess('open', [path]);
     }
 
     final xcodeproj =
         files.firstWhereOrNull((e) => e.path.endsWith('.xcodeproj'));
     if (xcodeproj != null) {
-      return runProcess('open', [xcodeproj.path]);
+      final path = relative(xcodeproj.path);
+      print('Opening $path in Xcode...');
+      return runProcess('open', [path]);
     }
 
+    print('Opening $path in VSCode...');
     return runProcess('code', [path]);
   }
 }
