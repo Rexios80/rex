@@ -2,7 +2,7 @@ name: rex
 publish_to: none
 
 environment:
-  sdk: ">=2.18.0 <3.0.0"
+  sdk: ^3.0.0
 
 dependencies:
   ansicolor: ^2.0.1
@@ -12,7 +12,7 @@ dependencies:
   pub_api_client: ^2.3.0
 
 dev_dependencies:
-  rexios_lints: ^5.0.0
+  rexios_lints: ^6.0.1
 
 executables:
   rex: rex
