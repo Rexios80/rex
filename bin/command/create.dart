@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
+import 'package:collection/collection.dart';
 import 'package:rex/scripts.dart';
 import 'package:rex/util.dart';
 
@@ -45,17 +46,19 @@ class CreateDartCommand extends Command {
     final path = args.last;
     final pubspec = File('$path/pubspec.yaml');
     final pubspecContent = pubspec
-        .readAsStringSync()
-        // Remove all comments including leading spaces
-        .replaceAll(RegExp('[ ]*#.*'), '')
+        .readAsLinesSync()
+        .whereNot(
+          (e) =>
+              // Remove all comments
+              e.trim().startsWith('#') ||
+              // Remove `cupertino_icons` package
+              e.contains('cupertino_icons') ||
+              // Remove any `lints` package
+              e.contains('lints'),
+        )
+        .join('\n')
         // Fix `publish_to` line
-        .replaceFirst(RegExp('publish_to: .*'), 'publish_to: none')
-        // Remove `cupertino_icons` package
-        .replaceFirst(RegExp('cupertino_icons: .*'), '')
-        // Remove any `lints` package
-        .replaceFirst(RegExp('.*lints: .*'), '')
-        // Remove extra newlines
-        .replaceAll(RegExp('\n\n\n+'), '\n\n');
+        .replaceFirst(RegExp('publish_to: .*'), 'publish_to: none');
 
     pubspec.writeAsStringSync(pubspecContent);
 
