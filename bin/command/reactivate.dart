@@ -14,27 +14,33 @@ class ReactivateCommand extends Command {
   final invocation = 'rex reactivate [package]';
 
   @override
-  Future<void> run() {
+  Future<void> run() async {
     final package = argResults?.rest.firstOrNull;
 
-    final List<String> source;
     if (package == null) {
       print('Reactivating rex...');
-      source = ['--source', 'git', 'https://github.com/Rexios80/rex'];
+      await runProcess('dart', [
+        'pub',
+        'global',
+        'activate',
+        '--source',
+        'git',
+        'https://github.com/Rexios80/rex',
+      ]);
     } else if (package == '.') {
       print('Reactivating current directory...');
-      source = ['--source', 'path', '.'];
+      await runProcess('dart', [
+        'pub',
+        'global',
+        'activate',
+        '--source',
+        'path',
+        '.',
+      ]);
     } else {
       print('Reactivating $package...');
-      source = [package];
+      await runProcess('dart', ['pub', 'global', 'deactivate', package]);
+      await runProcess('dart', ['pub', 'global', 'activate', package]);
     }
-
-    return runProcess('dart', [
-      'pub',
-      'global',
-      'activate',
-      ...source,
-      '--overwrite',
-    ]);
   }
 }
