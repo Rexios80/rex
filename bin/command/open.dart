@@ -24,11 +24,11 @@ class OpenCommand extends Command {
       return;
     }
 
-    print('Opening $path in Sublime Merge...');
-    try {
+    if (File('$path/.git').existsSync()) {
+      print('Opening $path in Sublime Merge...');
       await runProcess('smerge', ['-b', path]);
-    } catch (e) {
-      print('Failed to open in Sublime Merge: $e');
+    } else {
+      print('No git repository found at $path');
     }
 
     final files = Directory(path).listSync();
