@@ -25,7 +25,11 @@ class OpenCommand extends Command {
     }
 
     print('Opening $path in Sublime Merge...');
-    await runProcess('smerge', ['-b', path]);
+    try {
+      await runProcess('smerge', ['-b', path]);
+    } catch (e) {
+      print('Failed to open in Sublime Merge: $e');
+    }
 
     final files = Directory(path).listSync();
 
