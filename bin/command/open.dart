@@ -24,7 +24,7 @@ class OpenCommand extends Command {
       return;
     }
 
-    if (File('$path/.git').existsSync()) {
+    if (Directory('$path/.git').existsSync()) {
       print('Opening $path in Sublime Merge...');
       await runProcess('smerge', ['-b', path]);
     } else {
