@@ -31,6 +31,7 @@ class ReactivateCommand extends Command {
       ]);
     } else if (package == '.') {
       print('Reactivating current directory...');
+      await runProcess('puby', ['relink']);
       await runProcess('dart', [..._activateArgs, '--source', 'path', '.']);
     } else {
       print('Reactivating $package...');
