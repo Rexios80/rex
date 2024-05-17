@@ -2,6 +2,9 @@ import 'package:args/command_runner.dart';
 import 'package:collection/collection.dart';
 import 'package:rex/util.dart';
 
+const _activateArgs = ['pub', 'global', 'activate'];
+const _deactivateArgs = ['pub', 'global', 'deactivate'];
+
 class ReactivateCommand extends Command {
   @override
   final name = 'reactivate';
@@ -19,28 +22,20 @@ class ReactivateCommand extends Command {
 
     if (package == null) {
       print('Reactivating rex...');
+      await runProcess('dart', [..._deactivateArgs, 'rex']);
       await runProcess('dart', [
-        'pub',
-        'global',
-        'activate',
+        ..._activateArgs,
         '--source',
         'git',
         'https://github.com/Rexios80/rex',
       ]);
     } else if (package == '.') {
       print('Reactivating current directory...');
-      await runProcess('dart', [
-        'pub',
-        'global',
-        'activate',
-        '--source',
-        'path',
-        '.',
-      ]);
+      await runProcess('dart', [..._activateArgs, '--source', 'path', '.']);
     } else {
       print('Reactivating $package...');
-      await runProcess('dart', ['pub', 'global', 'deactivate', package]);
-      await runProcess('dart', ['pub', 'global', 'activate', package]);
+      await runProcess('dart', [..._deactivateArgs, package]);
+      await runProcess('dart', [..._activateArgs, package]);
     }
   }
 }
