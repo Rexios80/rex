@@ -97,6 +97,6 @@ class CloneDartCommand extends BaseCloneCommand {
   @override
   Future<void> run() => clone(
         preprocess: (folder) =>
-            runProcess('puby', ['get'], workingDirectory: folder),
+            runProcess('puby', ['link'], workingDirectory: folder),
       );
 }
