@@ -30,4 +30,5 @@ const gradleSync = r'''
 /// Helper to emulate `flutter run --wasm` until that command hits Flutter stable
 const flutterRunWasm = r'''
 flutter build web --wasm --no-strip-wasm
-dhttpd "--headers=Cross-Origin-Embedder-Policy=credentialless;Cross-Origin-Opener-Policy=same-origin" --path build/web''';
+dhttpd "--headers=Cross-Origin-Embedder-Policy=credentialless;Cross-Origin-Opener-Policy=same-origin" --path build/web
+open -a "Google Chrome" http://localhost:8080''';
