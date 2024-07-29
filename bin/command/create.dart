@@ -41,7 +41,11 @@ class CreateDartCommand extends Command {
   Future<void> run() async {
     print('Creating a new $name project...');
     final args = List.from(argResults?.rest ?? []);
-    final noGit = args.remove('--no-git');
+
+    // If this project is part of a mono-repo
+    // If so, do not git init or open the project
+    final mono = args.remove('--mono');
+
     await runProcess(name, ['create', ...args]);
 
     final path = args.last;
@@ -77,9 +81,9 @@ class CreateDartCommand extends Command {
         .writeAsStringSync('include: package:rexios_lints/$name/$rules.yaml');
 
     // Initialize a git repository
-    if (!noGit) {
+    if (!mono) {
       await runScript(gitInit, workingDirectory: path);
+      await runner!.run(['open', path]);
     }
-    await runner!.run(['open', path]);
   }
 }
