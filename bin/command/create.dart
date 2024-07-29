@@ -40,7 +40,7 @@ class CreateDartCommand extends Command {
   @override
   Future<void> run() async {
     print('Creating a new $name project...');
-    final args = argResults?.rest ?? [];
+    final args = List.from(argResults?.rest ?? []);
     final noGit = args.remove('--no-git');
     await runProcess(name, ['create', ...args]);
 
