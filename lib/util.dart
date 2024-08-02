@@ -16,6 +16,7 @@ Future<void> runProcess(
     executable,
     arguments,
     workingDirectory: workingDirectory,
+    runInShell: true,
   );
 
   unawaited(stdout.addStream(process.stdout));
