@@ -64,9 +64,19 @@ class CreateDartCommand extends Command {
         )
         .join('\n')
         // Fix `publish_to` line
-        .replaceFirst(RegExp('publish_to: .*'), 'publish_to: none');
+        .replaceFirst(
+          RegExp('publish_to: .*\n', multiLine: true),
+          'publish_to: none',
+        )
+        // Remove extra newlines
+        .replaceAll(RegExp('\n\n\n+', multiLine: true), '\n\n')
+        .replaceFirstMapped(
+          RegExp('^(.+):\n\n+', multiLine: true),
+          (m) => '${m[1]}:\n',
+        )
+        .trim();
 
-    pubspec.writeAsStringSync(pubspecContent);
+    pubspec.writeAsStringSync('$pubspecContent\n');
 
     // Replace default lints with my own
     await runProcess(
@@ -79,7 +89,7 @@ class CreateDartCommand extends Command {
     final rules = isPackage ? 'package' : 'core';
 
     File(p.join(path, 'analysis_options.yaml'))
-        .writeAsStringSync('include: package:rexios_lints/$name/$rules.yaml');
+        .writeAsStringSync('include: package:rexios_lints/$name/$rules.yaml\n');
 
     // Initialize a git repository
     if (!mono) {
