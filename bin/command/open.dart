@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:collection/collection.dart';
-import 'package:path/path.dart';
 import 'package:rex/pens.dart';
 import 'package:rex/util.dart';
 import 'package:path/path.dart' as p;
@@ -38,7 +37,7 @@ class OpenCommand extends Command {
     final xcworkspace =
         files.firstWhereOrNull((e) => e.path.endsWith('.xcworkspace'));
     if (xcworkspace != null) {
-      final path = relative(xcworkspace.path);
+      final path = p.relative(xcworkspace.path);
       print('Opening $path in Xcode...');
       return runProcess('open', [path]);
     }
@@ -46,7 +45,7 @@ class OpenCommand extends Command {
     final xcodeproj =
         files.firstWhereOrNull((e) => e.path.endsWith('.xcodeproj'));
     if (xcodeproj != null) {
-      final path = relative(xcodeproj.path);
+      final path = p.relative(xcodeproj.path);
       print('Opening $path in Xcode...');
       return runProcess('open', [path]);
     }
