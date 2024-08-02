@@ -5,6 +5,7 @@ import 'package:args/command_runner.dart';
 import 'package:collection/collection.dart';
 import 'package:rex/scripts.dart';
 import 'package:rex/util.dart';
+import 'package:path/path.dart' as p;
 
 class CreateCommand extends Command {
   @override
@@ -49,7 +50,7 @@ class CreateDartCommand extends Command {
     await runProcess(name, ['create', ...args]);
 
     final path = args.last;
-    final pubspec = File('$path/pubspec.yaml');
+    final pubspec = File(p.join(path, 'pubspec.yaml'));
     final pubspecContent = pubspec
         .readAsLinesSync()
         .whereNot(
@@ -77,7 +78,7 @@ class CreateDartCommand extends Command {
     final isPackage = args.any(['package', 'plugin', 'plugin_ffi'].contains);
     final rules = isPackage ? 'package' : 'core';
 
-    File('$path/analysis_options.yaml')
+    File(p.join(path, 'analysis_options.yaml'))
         .writeAsStringSync('include: package:rexios_lints/$name/$rules.yaml');
 
     // Initialize a git repository

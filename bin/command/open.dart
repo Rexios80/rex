@@ -5,6 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:path/path.dart';
 import 'package:rex/pens.dart';
 import 'package:rex/util.dart';
+import 'package:path/path.dart' as p;
 
 class OpenCommand extends Command {
   @override
@@ -24,7 +25,7 @@ class OpenCommand extends Command {
       return;
     }
 
-    if (Directory('$path/.git').existsSync()) {
+    if (Directory(p.join(path, '.git')).existsSync()) {
       print('Opening $path in Sublime Merge...');
       await runProcess('smerge', ['-b', path]);
     } else {
