@@ -158,10 +158,13 @@ Future<void> _fbemu({String? workingDirectory}) async {
     final result = Process.runSync('lsof', ['-t', '-i', 'tcp:$port']);
     if (result.exitCode != 0) continue;
 
-    final pid = result.stdout.toString().trim();
-    if (pid.isEmpty) continue;
+    final output = result.stdout.toString().trim();
+    if (output.isEmpty) continue;
 
-    Process.runSync('kill', [pid]);
+    final pids = output.split('\n');
+    for (final pid in pids) {
+      Process.runSync('kill', [pid]);
+    }
   }
 
   return runProcess('firebase', [
