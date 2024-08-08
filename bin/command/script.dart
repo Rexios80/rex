@@ -8,7 +8,10 @@ class ScriptCommand extends Command {
 
   @override
   String get description {
-    final buffer = StringBuffer('Available scripts:\n');
+    final buffer = StringBuffer('''
+Run a script by name
+Available scripts:
+''');
     final longestName = Scripts.all.map((s) => s.name.length).max;
     for (final script in Scripts.all) {
       final space = ' ' * (longestName - script.name.length + 3);
