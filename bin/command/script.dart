@@ -8,7 +8,15 @@ class ScriptCommand extends Command {
   final String name = 'script';
 
   @override
-  final String description = 'Run a script by name';
+  String get description {
+    final buffer = StringBuffer('Available scripts:\n');
+    final longestName = scripts.map((s) => s.name.length).max;
+    for (final script in scripts) {
+      final space = ' ' * (longestName - script.name.length + 3);
+      buffer.writeln('  ${script.name}$space${script.description}');
+    }
+    return buffer.toString();
+  }
 
   @override
   final String invocation = 'rex script [name]';
@@ -20,11 +28,11 @@ class ScriptCommand extends Command {
       runner!.usageException('Specify a script to run');
     }
 
-    final script = scriptMap[name];
+    final script = scripts.firstWhereOrNull((s) => s.name == name);
     if (script == null) {
       runner!.usageException('Unknown script: $name');
     }
 
-    await runScript(script);
+    await runScript(script.script);
   }
 }
