@@ -135,11 +135,26 @@ git commit -m "Initial commit"''';
 const _gradleSync = r'''
 ./gradlew prepareKotlinBuildScriptModel''';
 
+const _fbemuPorts = {
+  4000,
+  4400,
+  4500,
+  5000,
+  5001,
+  8080,
+  8085,
+  9000,
+  9099,
+  9199,
+  9299,
+  9399,
+};
+
 /// Ensure ports are free and start Firebase emulators with caching
 ///
-/// Port killing based on https://github.com/firebase/firebase-tools/blob/8f346008860a6839252f33c10ce305b5138403dd/scripts/triggers-end-to-end-tests/run.sh
+/// Ports from https://github.com/firebase/firebase-tools/blob/master/src/emulator/constants.ts
 Future<void> _fbemu({String? workingDirectory}) async {
-  for (final port in {4000, 9000, 9001, 9002, 8085, 9099, 9199}) {
+  for (final port in _fbemuPorts) {
     final result = Process.runSync('lsof', ['-t', '-i', 'tcp:$port']);
     if (result.exitCode != 0) continue;
 
