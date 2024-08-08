@@ -64,11 +64,12 @@ const gradleSync = r'''
 ./gradlew prepareKotlinBuildScriptModel''';
 
 /// Ensure ports are free and start Firebase emulators with caching
+///
+/// Port killing based on https://github.com/firebase/firebase-tools/blob/8f346008860a6839252f33c10ce305b5138403dd/scripts/triggers-end-to-end-tests/run.sh
 const fbemu = r'''
-lsof -t -i tcp:9099 | xargs kill
-lsof -t -i tcp:5001 | xargs kill
-lsof -t -i tcp:9000 | xargs kill
-lsof -t -i tcp:9098 | xargs kill
-lsof -t -i tcp:8087 | xargs kill
+for PORT in 4000 9000 9001 9002 8085 9099 9199
+do
+  lsof -t -i tcp:$PORT | xargs kill
+done
 
 firebase emulators:start --export-on-exit=emcache --import=emcache''';
