@@ -1,7 +1,6 @@
 import 'package:args/command_runner.dart';
 import 'package:collection/collection.dart';
 import 'package:rex/scripts.dart';
-import 'package:rex/util.dart';
 
 class ScriptCommand extends Command {
   @override
@@ -10,8 +9,8 @@ class ScriptCommand extends Command {
   @override
   String get description {
     final buffer = StringBuffer('Available scripts:\n');
-    final longestName = scripts.map((s) => s.name.length).max;
-    for (final script in scripts) {
+    final longestName = Scripts.all.map((s) => s.name.length).max;
+    for (final script in Scripts.all) {
       final space = ' ' * (longestName - script.name.length + 3);
       buffer.writeln('  ${script.name}$space${script.description}');
     }
@@ -22,17 +21,17 @@ class ScriptCommand extends Command {
   final String invocation = 'rex script [name]';
 
   @override
-  Future<void> run() async {
+  Future<void> run() {
     final name = argResults?.rest.firstOrNull;
     if (name == null) {
       runner!.usageException('Specify a script to run');
     }
 
-    final script = scripts.firstWhereOrNull((s) => s.name == name);
+    final script = Scripts.all.firstWhereOrNull((s) => s.name == name);
     if (script == null) {
       runner!.usageException('Unknown script: $name');
     }
 
-    await runScript(script.script);
+    return script.run();
   }
 }

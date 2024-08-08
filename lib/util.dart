@@ -28,17 +28,3 @@ Future<void> runProcess(
     exit(exitCode);
   }
 }
-
-/// Run a script string
-Future<void> runScript(String script, {String? workingDirectory}) async {
-  final commands = script.split('\n').map(
-        (e) => RegExp(r'[\""].+?[\""]|[^ ]+')
-            .allMatches(e)
-            .map((e) => e.group(0)!.replaceAll('"', '')),
-      );
-  for (final command in commands) {
-    final executable = command.first;
-    final arguments = command.skip(1).toList();
-    await runProcess(executable, arguments, workingDirectory: workingDirectory);
-  }
-}

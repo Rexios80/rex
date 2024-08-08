@@ -1,49 +1,121 @@
-/// Data describing a rex script
-class RexScript {
-  /// String used to run the script
+import 'dart:async';
+import 'dart:io';
+
+import 'package:rex/util.dart';
+
+/// Base class for scripts
+abstract class RexScript {
+  /// Name of the script
   final String name;
 
-  /// Description of the script to show in help output
+  /// Description of the script to display in help output
   final String description;
-
-  /// Script to run
-  final String script;
 
   /// Constructor
   const RexScript({
     required this.name,
     required this.description,
-    required this.script,
   });
+
+  /// Run the script
+  Future<void> run({String? workingDirectory});
 }
 
-/// All available scripts
-const scripts = [
-  RexScript(
+/// A script that is run from a raw string
+class RawScript extends RexScript {
+  /// Script to run
+  final String script;
+
+  /// Constructor
+  const RawScript({
+    required super.name,
+    required super.description,
+    required this.script,
+  });
+
+  @override
+  Future<void> run({String? workingDirectory}) async {
+    final commands = script.split('\n').map(
+          (e) => RegExp(r'[\""].+?[\""]|[^ ]+')
+              .allMatches(e)
+              .map((e) => e.group(0)!.replaceAll('"', '')),
+        );
+    for (final command in commands) {
+      final executable = command.first;
+      final arguments = command.skip(1).toList();
+      await runProcess(
+        executable,
+        arguments,
+        workingDirectory: workingDirectory,
+      );
+    }
+  }
+}
+
+/// A script that runs dart code
+class DartScript extends RexScript {
+  /// Dart code to run
+  final Future<void> Function({String? workingDirectory}) code;
+
+  /// Constructor
+  const DartScript({
+    required super.name,
+    required super.description,
+    required this.code,
+  });
+
+  @override
+  Future<void> run({String? workingDirectory}) =>
+      code(workingDirectory: workingDirectory);
+}
+
+/// Contains scripts
+abstract class Scripts {
+  /// All available scripts
+  static const all = [
+    resetXcode,
+    gitInit,
+    gradleSync,
+    fbemu,
+  ];
+
+  /// Reset Xcode
+  static const resetXcode = RawScript(
     name: 'reset-xcode',
     description: 'Reset Xcode',
-    script: resetXcode,
-  ),
-  RexScript(
+    script: _resetXcode,
+  );
+
+  /// Git init
+  static const gitInit = RawScript(
     name: 'git-init',
     description: 'Initialize a git repository and commit all files',
-    script: gitInit,
-  ),
-  RexScript(
+    script: _gitInit,
+  );
+
+  /// Gradle sync
+  static const gradleSync = RawScript(
     name: 'gradle-sync',
     description: 'Gradle sync',
-    script: gradleSync,
-  ),
-  RexScript(
+    script: _gradleSync,
+  );
+
+  /// Firebase emulators
+  static const fbemu = DartScript(
     name: 'fbemu',
     description:
         'Ensure ports are free and start Firebase emulators with caching',
-    script: fbemu,
-  ),
-];
+    code: _fbemu,
+  );
+}
+
+/// The following script strings must follow a few rules:
+/// - No empty lines
+/// - No comments
+/// - Each line is a completely self-contained command
 
 /// https://gist.github.com/maciekish/66b6deaa7bc979d0a16c50784e16d697
-const resetXcode = r'''
+const _resetXcode = r'''
 killall Xcode
 xcrun -k
 xcodebuild -alltargets clean
@@ -54,22 +126,32 @@ rm -rf ~/Library/Caches/com.apple.dt.Xcode/*
 open /Applications/Xcode.app''';
 
 /// Initialize a git repository and commit all files
-const gitInit = r'''
+const _gitInit = r'''
 git init
 git add .
 git commit -m "Initial commit"''';
 
 /// Gradle sync
-const gradleSync = r'''
+const _gradleSync = r'''
 ./gradlew prepareKotlinBuildScriptModel''';
 
 /// Ensure ports are free and start Firebase emulators with caching
 ///
 /// Port killing based on https://github.com/firebase/firebase-tools/blob/8f346008860a6839252f33c10ce305b5138403dd/scripts/triggers-end-to-end-tests/run.sh
-const fbemu = r'''
-for PORT in 4000 9000 9001 9002 8085 9099 9199
-do
-  lsof -t -i tcp:$PORT | xargs kill
-done
+Future<void> _fbemu({String? workingDirectory}) async {
+  for (final port in {4000, 9000, 9001, 9002, 8085, 9099, 9199}) {
+    final result = Process.runSync('lsof', ['-t', '-i', 'tcp:$port']);
+    if (result.exitCode != 0) continue;
 
-firebase emulators:start --export-on-exit=emcache --import=emcache''';
+    final pid = result.stdout.toString().trim();
+    if (pid.isEmpty) continue;
+
+    Process.runSync('kill', [pid]);
+  }
+
+  return runProcess('firebase', [
+    'emulators:start',
+    '--export-on-exit=emcache',
+    '--import=emcache',
+  ]);
+}
