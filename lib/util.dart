@@ -17,7 +17,9 @@ Future<void> runProcess(
     arguments,
     workingDirectory: workingDirectory,
     runInShell: true,
-    mode: ProcessStartMode.inheritStdio,
+    mode: stdin.hasTerminal
+        ? ProcessStartMode.inheritStdio
+        : ProcessStartMode.normal,
   );
 
   unawaited(stdout.addStream(process.stdout));
