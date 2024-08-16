@@ -17,11 +17,11 @@ class OpenCommand extends Command {
   final invocation = 'rex open [path]';
 
   @override
-  Future<void> run() async {
+  Future<int> run() async {
     final path = argResults?.rest.firstOrNull ?? '.';
     if (!Directory(path).existsSync()) {
       print(redPen('That path does not exist'));
-      return;
+      return 1;
     }
 
     if (Directory(p.join(path, '.git')).existsSync()) {

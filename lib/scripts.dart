@@ -18,7 +18,7 @@ abstract class RexScript {
   });
 
   /// Run the script
-  Future<void> run({String? workingDirectory});
+  Future<int> run({String? workingDirectory});
 }
 
 /// A script that is run from a raw string
@@ -34,28 +34,31 @@ class RawScript extends RexScript {
   });
 
   @override
-  Future<void> run({String? workingDirectory}) async {
+  Future<int> run({String? workingDirectory}) async {
     final commands = script.split('\n').map(
           (e) => RegExp(r'[\""].+?[\""]|[^ ]+')
               .allMatches(e)
               .map((e) => e.group(0)!.replaceAll('"', '')),
         );
+    var exitCode = 0;
     for (final command in commands) {
       final executable = command.first;
       final arguments = command.skip(1).toList();
-      await runProcess(
+      exitCode |= await runProcess(
         executable,
         arguments,
         workingDirectory: workingDirectory,
       );
+      if (exitCode != 0) break;
     }
+    return exitCode;
   }
 }
 
 /// A script that runs dart code
 class DartScript extends RexScript {
   /// Dart code to run
-  final Future<void> Function({String? workingDirectory}) code;
+  final Future<int> Function({String? workingDirectory}) code;
 
   /// Constructor
   const DartScript({
@@ -65,7 +68,7 @@ class DartScript extends RexScript {
   });
 
   @override
-  Future<void> run({String? workingDirectory}) =>
+  Future<int> run({String? workingDirectory}) =>
       code(workingDirectory: workingDirectory);
 }
 
@@ -160,7 +163,7 @@ const _fbemuPorts = {
 /// Ensure ports are free and start Firebase emulators with caching
 ///
 /// Ports from https://github.com/firebase/firebase-tools/blob/master/src/emulator/constants.ts
-Future<void> _fbemu({String? workingDirectory}) async {
+Future<int> _fbemu({String? workingDirectory}) async {
   for (final port in _fbemuPorts) {
     final result = Process.runSync('lsof', ['-t', '-i', 'tcp:$port']);
     if (result.exitCode != 0) continue;
