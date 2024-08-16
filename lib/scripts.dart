@@ -77,6 +77,7 @@ abstract class Scripts {
     gitInit,
     gradleSync,
     fbemu,
+    embedme,
   ];
 
   /// Reset Xcode
@@ -106,6 +107,12 @@ abstract class Scripts {
     description:
         'Ensure ports are free and start Firebase emulators with caching',
     code: _fbemu,
+  );
+
+  static const embedme = RawScript(
+    name: 'embedme',
+    description: 'Embed code snippets in markdown files',
+    script: 'npx embedme **/*.md',
   );
 }
 
