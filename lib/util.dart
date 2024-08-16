@@ -11,15 +11,14 @@ Future<void> runProcess(
   String executable,
   List<String> arguments, {
   String? workingDirectory,
+  ProcessStartMode mode = ProcessStartMode.inheritStdio,
 }) async {
   final process = await Process.start(
     executable,
     arguments,
     workingDirectory: workingDirectory,
     runInShell: true,
-    mode: stdin.hasTerminal
-        ? ProcessStartMode.inheritStdio
-        : ProcessStartMode.normal,
+    mode: mode,
   );
 
   unawaited(stdout.addStream(process.stdout));

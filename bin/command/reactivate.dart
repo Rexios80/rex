@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:args/command_runner.dart';
 import 'package:collection/collection.dart';
 import 'package:rex/util.dart';
@@ -22,13 +24,21 @@ class ReactivateCommand extends Command {
 
     if (package == null) {
       print('Reactivating rex...');
-      await runProcess('dart', [..._deactivateArgs, 'rex']);
-      await runProcess('dart', [
-        ..._activateArgs,
-        '--source',
-        'git',
-        'https://github.com/Rexios80/rex',
-      ]);
+      await runProcess(
+        'dart',
+        [..._deactivateArgs, 'rex'],
+        mode: ProcessStartMode.normal,
+      );
+      await runProcess(
+        'dart',
+        [
+          ..._activateArgs,
+          '--source',
+          'git',
+          'https://github.com/Rexios80/rex',
+        ],
+        mode: ProcessStartMode.normal,
+      );
     } else if (package == '.') {
       print('Reactivating current directory...');
       await runProcess('puby', ['relink']);
