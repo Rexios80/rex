@@ -86,10 +86,11 @@ class CreateDartCommand extends Command {
     );
 
     final isPackage = args.any(['package', 'plugin', 'plugin_ffi'].contains);
-    final rules = isPackage ? 'package' : 'core';
+    final ruleset = isPackage ? 'package' : 'core';
 
-    File(p.join(path, 'analysis_options.yaml'))
-        .writeAsStringSync('include: package:rexios_lints/$name/$rules.yaml\n');
+    File(p.join(path, 'analysis_options.yaml')).writeAsStringSync(
+      'include: package:rexios_lints/$name/${ruleset}_extra.yaml\n',
+    );
 
     // Initialize a git repository
     if (!mono) {

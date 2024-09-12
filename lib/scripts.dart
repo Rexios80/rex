@@ -112,6 +112,7 @@ abstract class Scripts {
     code: _fbemu,
   );
 
+  /// Embed code snippets in markdown files
   static const embedme = RawScript(
     name: 'embedme',
     description: 'Embed code snippets in markdown files',
