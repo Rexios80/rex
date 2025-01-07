@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:args/command_runner.dart';
 import 'package:collection/collection.dart';
+import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:rex/util.dart';
 
 const _activateArgs = ['pub', 'global', 'activate'];
@@ -30,7 +33,11 @@ class ReactivateCommand extends Command {
         'https://github.com/Rexios80/rex',
       ]);
     } else if (package == '.') {
-      print('Reactivating current directory...');
+      final pubspec = Pubspec.parse(File('pubspec.yaml').readAsStringSync());
+      final package = pubspec.name;
+
+      print('Reactivating $package from source...');
+      await runProcess('dart', [..._deactivateArgs, package]);
       await runProcess('puby', ['relink']);
       await runProcess('dart', [..._activateArgs, '--source', 'path', '.']);
     } else {
