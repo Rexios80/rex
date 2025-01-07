@@ -37,7 +37,8 @@ class ReactivateCommand extends Command {
       final package = pubspec.name;
 
       print('Reactivating $package from source...');
-      await runProcess('puby', ['relink']);
+      File('pubspec.lock').deleteSync();
+      await runProcess('dart', ['pub', 'get']);
       await runProcess('dart', [..._deactivateArgs, package]);
       await runProcess('dart', [..._activateArgs, '--source', 'path', '.']);
     } else {
