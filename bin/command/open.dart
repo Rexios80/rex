@@ -18,10 +18,16 @@ class OpenCommand extends Command {
 
   @override
   Future<int> run() async {
-    final path = argResults?.rest.firstOrNull ?? '.';
+    var path = argResults?.rest.firstOrNull ?? '.';
     if (!Directory(path).existsSync()) {
-      print(redPen('That path does not exist'));
-      return 1;
+      print(yellowPen('No project found at path: $path'));
+
+      // Attempt to find the project in the repos directory
+      path = p.join(home, 'repos', path);
+      if (!Directory(path).existsSync()) {
+        print(redPen('No project found at path: $path'));
+        return 1;
+      }
     }
 
     if (Directory(p.join(path, '.git')).existsSync()) {
