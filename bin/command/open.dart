@@ -57,6 +57,11 @@ class OpenCommand extends Command {
     }
 
     print('Opening $path in Cursor...');
-    return runProcess('open', ['-a', 'Cursor', path]);
+    final openCursorResult = await runProcess('open', ['-a', 'Cursor', path]);
+    if (openCursorResult == 0) return 0;
+
+    print(yellowPen('Unable to open Cursor'));
+    print('Falling back to VSCode...');
+    return runProcess('open', ['-a', 'Visual Studio Code', path]);
   }
 }
