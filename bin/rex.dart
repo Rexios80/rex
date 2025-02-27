@@ -8,7 +8,6 @@ import 'command/create.dart';
 import 'command/open.dart';
 import 'command/reactivate.dart';
 import 'command/script.dart';
-import 'command/switch.dart';
 import 'command/view.dart';
 
 void main(List<String> arguments) async {
@@ -19,7 +18,6 @@ void main(List<String> arguments) async {
         'Tailored convenience commands for developer Rexios',
       )
         ..addCommand(OpenCommand())
-        ..addCommand(SwitchCommand())
         ..addCommand(CreateCommand())
         ..addCommand(CloneCommand())
         ..addCommand(ViewCommand())

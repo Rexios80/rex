@@ -11,7 +11,7 @@ class OpenCommand extends Command {
   final name = 'open';
 
   @override
-  final description = 'Open a project in in VSCode and Sublime Merge';
+  final description = 'Open a project in in Cursor and Sublime Merge';
 
   @override
   final invocation = 'rex open [path]';
@@ -32,7 +32,7 @@ class OpenCommand extends Command {
 
     if (Directory(p.join(path, '.git')).existsSync()) {
       print('Opening $path in Sublime Merge...');
-      await runProcess('smerge', ['-b', path]);
+      await runProcess('open', ['-a', 'Sublime Merge', path]);
     } else {
       print('No git repository found at $path');
     }
@@ -56,7 +56,7 @@ class OpenCommand extends Command {
       return runProcess('open', [path]);
     }
 
-    print('Opening $path in VSCode...');
-    return runProcess('code', [path]);
+    print('Opening $path in Cursor...');
+    return runProcess('open', ['-a', 'Cursor', path]);
   }
 }

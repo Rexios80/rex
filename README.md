@@ -11,8 +11,7 @@ Global options:
 
 Available commands:
   create   Create a new project
-  open     Open a project in in VSCode and Sublime Merge
-  switch   Open a project reusing the current windows
+  open     Open a project in in Cursor and Sublime Merge
 
 Run "rex help <command>" for more information about a command.
 ```
@@ -22,8 +21,8 @@ Installation:
 - Run `dart pub global activate --source path .` in the repository
 
 Requirements:
-- `open`, `switch`
-  - [VSCode](https://code.visualstudio.com/)
+- `open`
+  - [Cursor](https://www.cursor.com/)
   - [Sublime Merge](https://www.sublimemerge.com/)
 - `create dart/flutter`
   - [dart](https://dart.dev/)
