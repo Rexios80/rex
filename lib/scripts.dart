@@ -156,9 +156,9 @@ class FbemuCommand extends Command {
 class ImportCertCommand extends Command {
   @override
   final argParser = ArgParser()
-    ..addOption('path', help: 'Android Studio path', mandatory: true)
-    ..addOption('alias', help: 'Certificate alias', mandatory: true)
-    ..addOption('file', help: 'Certificate file path', mandatory: true);
+    ..addOption('path', abbr: 'p', help: 'Android Studio path', mandatory: true)
+    ..addOption('alias', abbr: 'a', help: 'Certificate alias', mandatory: true)
+    ..addOption('file', abbr: 'f', help: 'Certificate file path', mandatory: true);
 
   @override
   final name = 'asic';
