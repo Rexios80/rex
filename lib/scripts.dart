@@ -57,7 +57,7 @@ git commit -m "Initial commit"''';
 }
 
 /// Reset Xcode to hopefully fix build issues
-class ResetXcodeCommand extends Command<int> {
+class ResetXcodeCommand extends Command {
   @override
   final name = 'reset-xcode';
 
@@ -69,7 +69,7 @@ class ResetXcodeCommand extends Command<int> {
 }
 
 /// Initialize a git repository
-class GitInitCommand extends Command<int> {
+class GitInitCommand extends Command {
   @override
   final name = 'git-init';
 
@@ -81,7 +81,7 @@ class GitInitCommand extends Command<int> {
 }
 
 /// Gradle sync
-class GradleSyncCommand extends Command<int> {
+class GradleSyncCommand extends Command {
   @override
   final name = 'gradle-sync';
 
@@ -93,7 +93,7 @@ class GradleSyncCommand extends Command<int> {
 }
 
 /// Embed code snippets in markdown files
-class EmbedmeCommand extends Command<int> {
+class EmbedmeCommand extends Command {
   @override
   final name = 'embedme';
 
@@ -107,7 +107,7 @@ class EmbedmeCommand extends Command<int> {
 /// Ensure ports are free and start Firebase emulators with caching
 ///
 /// Ports from https://github.com/firebase/firebase-tools/blob/master/src/emulator/constants.ts
-class FbemuCommand extends Command<int> {
+class FbemuCommand extends Command {
   static const _ports = {
     4000,
     4400,
@@ -153,7 +153,7 @@ class FbemuCommand extends Command<int> {
 }
 
 /// Import a certificate to Android Studio's keystore
-class ImportCertCommand extends Command<int> {
+class ImportCertCommand extends Command {
   @override
   final argParser = ArgParser()
     ..addOption('path', help: 'Android Studio path', mandatory: true)

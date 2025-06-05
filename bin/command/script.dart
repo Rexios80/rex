@@ -1,7 +1,7 @@
 import 'package:args/command_runner.dart';
 import 'package:rex/scripts.dart';
 
-class ScriptCommand extends Command<int> {
+class ScriptCommand extends Command {
   @override
   final String name = 'script';
 
