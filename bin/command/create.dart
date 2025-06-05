@@ -94,7 +94,7 @@ class CreateDartCommand extends Command {
 
     // Initialize a git repository
     if (!mono) {
-      await Scripts.gitInit.run(workingDirectory: path);
+      await Scripts.run(Scripts.gitInit, workingDirectory: path);
       await runner!.run(['open', path]);
     }
   }

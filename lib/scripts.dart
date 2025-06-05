@@ -1,40 +1,41 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:args/args.dart';
+import 'package:args/command_runner.dart';
 import 'package:rex/util.dart';
 
-/// Base class for scripts
-abstract class RexScript {
-  /// Name of the script
-  final String name;
+/// The following script strings must follow a few rules:
+/// - No empty lines
+/// - No comments
+/// - Each line is a completely self-contained command
+abstract class Scripts {
+  /// https://gist.github.com/maciekish/66b6deaa7bc979d0a16c50784e16d697
+  static const resetXcode = r'''
+killall Xcode
+xcrun -k
+xcodebuild -alltargets clean
+rm -rf "$(getconf DARWIN_USER_CACHE_DIR)/org.llvm.clang/ModuleCache"
+rm -rf "$(getconf DARWIN_USER_CACHE_DIR)/org.llvm.clang.$(whoami)/ModuleCache"
+rm -rf ~/Library/Developer/Xcode/DerivedData/*
+rm -rf ~/Library/Caches/com.apple.dt.Xcode/*
+open /Applications/Xcode.app''';
 
-  /// Description of the script to display in help output
-  final String description;
+  /// Initialize a git repository and commit all files
+  static const gitInit = r'''
+git init
+git add .
+git commit -m "Initial commit"''';
 
-  /// Constructor
-  const RexScript({
-    required this.name,
-    required this.description,
-  });
+  /// Gradle sync
+  static const gradleSync = r'''
+./gradlew prepareKotlinBuildScriptModel''';
 
-  /// Run the script
-  Future<int> run({String? workingDirectory});
-}
+  /// embedme
+  static const embedme = 'npx embedme **/*.md';
 
-/// A script that is run from a raw string
-class RawScript extends RexScript {
-  /// Script to run
-  final String script;
-
-  /// Constructor
-  const RawScript({
-    required super.name,
-    required super.description,
-    required this.script,
-  });
-
-  @override
-  Future<int> run({String? workingDirectory}) async {
+  /// Run a script string
+  static Future<int> run(String script, {String? workingDirectory}) async {
     final commands = script.split('\n').map(
           (e) => RegExp(r'[\""].+?[\""]|[^ ]+')
               .allMatches(e)
@@ -55,132 +56,133 @@ class RawScript extends RexScript {
   }
 }
 
-/// A script that runs dart code
-class DartScript extends RexScript {
-  /// Dart code to run
-  final Future<int> Function({String? workingDirectory}) code;
-
-  /// Constructor
-  const DartScript({
-    required super.name,
-    required super.description,
-    required this.code,
-  });
+/// Reset Xcode to hopefully fix build issues
+class ResetXcodeCommand extends Command<int> {
+  @override
+  final name = 'reset-xcode';
 
   @override
-  Future<int> run({String? workingDirectory}) =>
-      code(workingDirectory: workingDirectory);
+  final description = 'Reset Xcode';
+
+  @override
+  Future<int> run() => Scripts.run(Scripts.resetXcode);
 }
 
-/// Contains scripts
-abstract class Scripts {
-  /// All available scripts
-  static const all = [
-    resetXcode,
-    gitInit,
-    gradleSync,
-    fbemu,
-    embedme,
-  ];
+/// Initialize a git repository
+class GitInitCommand extends Command<int> {
+  @override
+  final name = 'git-init';
 
-  /// Reset Xcode
-  static const resetXcode = RawScript(
-    name: 'reset-xcode',
-    description: 'Reset Xcode',
-    script: _resetXcode,
-  );
+  @override
+  final description = 'Initialize a git repository and commit all files';
 
-  /// Git init
-  static const gitInit = RawScript(
-    name: 'git-init',
-    description: 'Initialize a git repository and commit all files',
-    script: _gitInit,
-  );
-
-  /// Gradle sync
-  static const gradleSync = RawScript(
-    name: 'gradle-sync',
-    description: 'Gradle sync',
-    script: _gradleSync,
-  );
-
-  /// Firebase emulators
-  static const fbemu = DartScript(
-    name: 'fbemu',
-    description:
-        'Ensure ports are free and start Firebase emulators with caching',
-    code: _fbemu,
-  );
-
-  /// Embed code snippets in markdown files
-  static const embedme = RawScript(
-    name: 'embedme',
-    description: 'Embed code snippets in markdown files',
-    script: 'npx embedme **/*.md',
-  );
+  @override
+  Future<int> run() => Scripts.run(Scripts.gitInit);
 }
-
-/// The following script strings must follow a few rules:
-/// - No empty lines
-/// - No comments
-/// - Each line is a completely self-contained command
-
-/// https://gist.github.com/maciekish/66b6deaa7bc979d0a16c50784e16d697
-const _resetXcode = r'''
-killall Xcode
-xcrun -k
-xcodebuild -alltargets clean
-rm -rf "$(getconf DARWIN_USER_CACHE_DIR)/org.llvm.clang/ModuleCache"
-rm -rf "$(getconf DARWIN_USER_CACHE_DIR)/org.llvm.clang.$(whoami)/ModuleCache"
-rm -rf ~/Library/Developer/Xcode/DerivedData/*
-rm -rf ~/Library/Caches/com.apple.dt.Xcode/*
-open /Applications/Xcode.app''';
-
-/// Initialize a git repository and commit all files
-const _gitInit = r'''
-git init
-git add .
-git commit -m "Initial commit"''';
 
 /// Gradle sync
-const _gradleSync = r'''
-./gradlew prepareKotlinBuildScriptModel''';
+class GradleSyncCommand extends Command<int> {
+  @override
+  final name = 'gradle-sync';
 
-const _fbemuPorts = {
-  4000,
-  4400,
-  4500,
-  5000,
-  5001,
-  8080,
-  8085,
-  9000,
-  9099,
-  9199,
-  9299,
-  9399,
-};
+  @override
+  final description = 'Gradle sync';
+
+  @override
+  Future<int> run() => Scripts.run(Scripts.gradleSync);
+}
+
+/// Embed code snippets in markdown files
+class EmbedmeCommand extends Command<int> {
+  @override
+  final name = 'embedme';
+
+  @override
+  final description = 'Embed code snippets in markdown files';
+
+  @override
+  Future<int> run() => Scripts.run(Scripts.embedme);
+}
 
 /// Ensure ports are free and start Firebase emulators with caching
 ///
 /// Ports from https://github.com/firebase/firebase-tools/blob/master/src/emulator/constants.ts
-Future<int> _fbemu({String? workingDirectory}) async {
-  for (final port in _fbemuPorts) {
-    final result = Process.runSync('lsof', ['-t', '-i', 'tcp:$port']);
-    if (result.exitCode != 0) continue;
+class FbemuCommand extends Command<int> {
+  static const _ports = {
+    4000,
+    4400,
+    4500,
+    5000,
+    5001,
+    8080,
+    8085,
+    9000,
+    9099,
+    9199,
+    9299,
+    9399,
+  };
+  @override
+  final name = 'fbemu';
 
-    final output = result.stdout.toString().trim();
-    if (output.isEmpty) continue;
+  @override
+  final description =
+      'Ensure ports are free and start Firebase emulators with caching';
 
-    final pids = output.split('\n');
-    for (final pid in pids) {
-      Process.runSync('kill', [pid]);
+  @override
+  Future<int> run() {
+    for (final port in _ports) {
+      final result = Process.runSync('lsof', ['-t', '-i', 'tcp:$port']);
+      if (result.exitCode != 0) continue;
+
+      final output = result.stdout.toString().trim();
+      if (output.isEmpty) continue;
+
+      final pids = output.split('\n');
+      for (final pid in pids) {
+        Process.runSync('kill', [pid]);
+      }
     }
-  }
 
-  return runProcess('firebase', [
-    'emulators:start',
-    '--export-on-exit=emcache',
-    '--import=emcache',
-  ]);
+    return runProcess('firebase', [
+      'emulators:start',
+      '--export-on-exit=emcache',
+      '--import=emcache',
+    ]);
+  }
+}
+
+/// Import a certificate to Android Studio's keystore
+class ImportCertCommand extends Command<int> {
+  @override
+  final argParser = ArgParser()
+    ..addOption('path', help: 'Android Studio path', mandatory: true)
+    ..addOption('alias', help: 'Certificate alias', mandatory: true)
+    ..addOption('file', help: 'Certificate file path', mandatory: true);
+
+  @override
+  final name = 'asic';
+
+  @override
+  final description = 'Import a certificate to Android Studio\'s keystore';
+
+  @override
+  Future<int> run() {
+    final path = argResults!['path'] as String;
+    final alias = argResults!['alias'] as String;
+    final file = argResults!['file'] as String;
+
+    return runProcess('$path/Contents/jbr/Contents/Home/bin/keytool', [
+      '-importcert',
+      '-trustcacerts',
+      '-alias',
+      alias,
+      '-file',
+      file,
+      '-keystore',
+      '$path/Contents/jbr/Contents/Home/lib/security/cacerts',
+      '-storepass',
+      'changeit',
+    ]);
+  }
 }
