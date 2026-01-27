@@ -40,16 +40,18 @@ class OpenCommand extends Command {
     final files = Directory(path).listSync();
 
     // Try to open an xcworkspace or xcodeproj file
-    final xcworkspace =
-        files.firstWhereOrNull((e) => e.path.endsWith('.xcworkspace'));
+    final xcworkspace = files.firstWhereOrNull(
+      (e) => e.path.endsWith('.xcworkspace'),
+    );
     if (xcworkspace != null) {
       final path = p.relative(xcworkspace.path);
       print('Opening $path in Xcode...');
       return runProcess('open', [path]);
     }
 
-    final xcodeproj =
-        files.firstWhereOrNull((e) => e.path.endsWith('.xcodeproj'));
+    final xcodeproj = files.firstWhereOrNull(
+      (e) => e.path.endsWith('.xcodeproj'),
+    );
     if (xcodeproj != null) {
       final path = p.relative(xcodeproj.path);
       print('Opening $path in Xcode...');

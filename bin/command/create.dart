@@ -31,15 +31,18 @@ class CreateDartCommand extends Command {
   final String name;
 
   @override
-  late String description = 'Create a new $name project';
+  late var description = 'Create a new $name project';
 
   @override
-  late String invocation = 'rex create $name [arguments]';
+  late var invocation = 'rex create $name [arguments]';
 
   CreateDartCommand(this.name);
 
   @override
   Future<void> run() async {
+    final runner = this.runner;
+    if (runner == null) return;
+
     print('Creating a new $name project...');
     final args = List.from(argResults?.rest ?? []);
 
@@ -79,11 +82,12 @@ class CreateDartCommand extends Command {
     pubspec.writeAsStringSync('$pubspecContent\n');
 
     // Replace default lints with my own
-    await runProcess(
-      name,
-      ['pub', 'add', 'rexios_lints', '--dev'],
-      workingDirectory: path,
-    );
+    await runProcess(name, [
+      'pub',
+      'add',
+      'rexios_lints',
+      '--dev',
+    ], workingDirectory: path);
 
     final isPackage = args.any(['package', 'plugin', 'plugin_ffi'].contains);
     final ruleset = isPackage ? 'package' : 'core';
@@ -95,7 +99,7 @@ class CreateDartCommand extends Command {
     // Initialize a git repository
     if (!mono) {
       await Scripts.run(Scripts.gitInit, workingDirectory: path);
-      await runner!.run(['open', path]);
+      await runner.run(['open', path]);
     }
   }
 }

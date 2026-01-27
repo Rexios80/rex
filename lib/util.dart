@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 /// Get the home directory
-final String home = Platform.environment['HOME']!;
+final String home = Platform.environment['HOME'] ?? '';
 
 /// Run a process and print output to [stdout] and [stderr]
 Future<int> runProcess(

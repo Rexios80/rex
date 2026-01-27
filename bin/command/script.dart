@@ -3,7 +3,7 @@ import 'package:rex/scripts.dart';
 
 class ScriptCommand extends Command {
   @override
-  final String name = 'script';
+  final name = 'script';
 
   @override
   final description = 'Run a script by name';

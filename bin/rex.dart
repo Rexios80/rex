@@ -11,22 +11,20 @@ import 'command/script.dart';
 import 'command/view.dart';
 
 void main(List<String> arguments) async {
-  await runZonedGuarded(
-    () async {
-      final runner = CommandRunner(
-        'rex',
-        'Tailored convenience commands for developer Rexios',
-      )
-        ..addCommand(OpenCommand())
-        ..addCommand(CreateCommand())
-        ..addCommand(CloneCommand())
-        ..addCommand(ViewCommand())
-        ..addCommand(ReactivateCommand())
-        ..addCommand(ScriptCommand());
-      await runner.run(arguments);
-    },
-    (error, stack) => print(error),
-  );
+  await runZonedGuarded(() async {
+    final runner =
+        CommandRunner(
+            'rex',
+            'Tailored convenience commands for developer Rexios',
+          )
+          ..addCommand(OpenCommand())
+          ..addCommand(CreateCommand())
+          ..addCommand(CloneCommand())
+          ..addCommand(ViewCommand())
+          ..addCommand(ReactivateCommand())
+          ..addCommand(ScriptCommand());
+    await runner.run(arguments);
+  }, (error, stack) => print(error));
 
   exit(0);
 }

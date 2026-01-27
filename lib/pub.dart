@@ -12,14 +12,15 @@ class Pub {
       return sanitizedHomepage;
     }
 
-    return _sanitizeRepoUrl(info.latestPubspec.unParsedYaml?['repository']);
+    return _sanitizeRepoUrl(info.latestPubspec.repository?.toString());
   }
 
   static String? _sanitizeRepoUrl(String? url) {
     if (url == null) return null;
 
-    final match =
-        RegExp(r'https:\/\/github\.com\/(.+?)\/(.+?)($|\/)').firstMatch(url);
+    final match = RegExp(
+      r'https:\/\/github\.com\/(.+?)\/(.+?)($|\/)',
+    ).firstMatch(url);
     if (match == null || match.groupCount < 2) return null;
 
     return 'https://github.com/${match[1]}/${match[2]}';

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
+import 'package:io/io.dart';
 import 'package:rex/util.dart';
 
 /// The following script strings must follow a few rules:
@@ -36,10 +37,12 @@ git commit -m "Initial commit"''';
 
   /// Run a script string
   static Future<int> run(String script, {String? workingDirectory}) async {
-    final commands = script.split('\n').map(
-          (e) => RegExp(r'[\""].+?[\""]|[^ ]+')
-              .allMatches(e)
-              .map((e) => e.group(0)!.replaceAll('"', '')),
+    final commands = script
+        .split('\n')
+        .map(
+          (e) => RegExp(
+            r'[\""].+?[\""]|[^ ]+',
+          ).allMatches(e).map((e) => e.group(0)?.replaceAll('"', '')).nonNulls,
         );
     var exitCode = 0;
     for (final command in commands) {
@@ -158,7 +161,12 @@ class ImportCertCommand extends Command {
   final argParser = ArgParser()
     ..addOption('path', abbr: 'p', help: 'Android Studio path', mandatory: true)
     ..addOption('alias', abbr: 'a', help: 'Certificate alias', mandatory: true)
-    ..addOption('file', abbr: 'f', help: 'Certificate file path', mandatory: true);
+    ..addOption(
+      'file',
+      abbr: 'f',
+      help: 'Certificate file path',
+      mandatory: true,
+    );
 
   @override
   final name = 'asic';
@@ -167,10 +175,13 @@ class ImportCertCommand extends Command {
   final description = 'Import a certificate to Android Studio\'s keystore';
 
   @override
-  Future<int> run() {
-    final path = argResults!['path'] as String;
-    final alias = argResults!['alias'] as String;
-    final file = argResults!['file'] as String;
+  Future<int> run() async {
+    final argResults = this.argResults;
+    if (argResults == null) return ExitCode.software.code;
+
+    final path = argResults['path'] as String;
+    final alias = argResults['alias'] as String;
+    final file = argResults['file'] as String;
 
     return runProcess('$path/Contents/jbr/Contents/Home/bin/keytool', [
       '-importcert',
