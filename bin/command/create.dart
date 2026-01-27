@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:collection/collection.dart';
+import 'package:rex/pens.dart';
 import 'package:rex/scripts.dart';
 import 'package:rex/util.dart';
 import 'package:path/path.dart' as p;
@@ -89,8 +90,12 @@ class CreateDartCommand extends Command {
       '--dev',
     ], workingDirectory: path);
 
-    final isPackage = args.any(['package', 'plugin', 'plugin_ffi'].contains);
-    final ruleset = isPackage ? 'package' : 'core';
+    final isPackage = args.contains('package');
+    final isPlugin = args.any(['plugin', 'plugin_ffi'].contains);
+    final ruleset = (isPackage || isPlugin) ? 'package' : 'core';
+    if (isPlugin && !args.contains('--org')) {
+      runner.usageException(redPen('Packages must be created with --org'));
+    }
 
     File(p.join(path, 'analysis_options.yaml')).writeAsStringSync(
       'include: package:rexios_lints/$name/${ruleset}_extra.yaml\n',
