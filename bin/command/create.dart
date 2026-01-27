@@ -47,6 +47,13 @@ class CreateDartCommand extends Command {
     print('Creating a new $name project...');
     final args = List.from(argResults?.rest ?? []);
 
+    final isPackage = args.contains('package');
+    final isPlugin = args.any(['plugin', 'plugin_ffi'].contains);
+
+    if (isPlugin && !args.contains('--org')) {
+      runner.usageException(redPen('Packages must be created with --org'));
+    }
+
     // If this project is part of a mono-repo
     // If so, do not git init or open the project
     final mono = args.remove('--mono');
@@ -90,13 +97,7 @@ class CreateDartCommand extends Command {
       '--dev',
     ], workingDirectory: path);
 
-    final isPackage = args.contains('package');
-    final isPlugin = args.any(['plugin', 'plugin_ffi'].contains);
     final ruleset = (isPackage || isPlugin) ? 'package' : 'core';
-    if (isPlugin && !args.contains('--org')) {
-      runner.usageException(redPen('Packages must be created with --org'));
-    }
-
     File(p.join(path, 'analysis_options.yaml')).writeAsStringSync(
       'include: package:rexios_lints/$name/${ruleset}_extra.yaml\n',
     );
