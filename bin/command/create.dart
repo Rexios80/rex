@@ -50,8 +50,10 @@ class CreateDartCommand extends Command {
     final isPackage = args.contains('package');
     final isPlugin = args.any(['plugin', 'plugin_ffi'].contains);
 
-    if (isPlugin && !args.contains('--org')) {
-      runner.usageException(redPen('Packages must be created with --org'));
+    if (name == 'flutter' && !args.contains('--org')) {
+      runner.usageException(
+        redPen('Flutter projects must be created with --org'),
+      );
     }
 
     // If this project is part of a mono-repo
