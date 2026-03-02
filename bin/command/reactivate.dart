@@ -5,7 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:rex/util.dart';
 
-const _activateArgs = ['pub', 'global', 'activate'];
+const _activateArgs = ['pub', 'global', 'activate', '--overwrite'];
 const _deactivateArgs = ['pub', 'global', 'deactivate'];
 
 class ReactivateCommand extends Command {
